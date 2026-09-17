@@ -5,7 +5,6 @@ on:
     branches: ["main", "master"]
   pull_request:
     branches: ["main", "master"]
-  # Allows manual runs from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -13,7 +12,6 @@ jobs:
     name: Scan Code
     runs-on: ubuntu-latest
 
-    # Optional: Needed if you want to upload results to GitHub Security Tab (Code Scanning)
     permissions:
       security-events: write
       contents: read
@@ -25,15 +23,14 @@ jobs:
       - name: Run Semgrep
         uses: semgrep/semgrep-action@v1
         with:
-          # Uses Semgrep's default, community-curated rulesets (OWASP Top 10, security audit)
           config: >-
             p/default
             p/security-audit
+          # Instruct Semgrep to output the SARIF file
+          generateSarif: "1"
 
-      # Optional: Upload results to GitHub Security tab (SARIF format)
-      # Requires GitHub Advanced Security for private repos, free for public repos
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: semgrep.sarif
